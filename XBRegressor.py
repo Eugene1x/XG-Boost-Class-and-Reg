@@ -37,3 +37,20 @@ class DecisionStump:
     def predict(self,X):
         return np.where(X[:,self.feature_index] <= self.threshold, 
                         self.left_value, self.right_value)
+    
+
+class GBR:
+    def __init__(self, numberEstimators, learningRate):
+        self.numberEstimators = numberEstimators
+        self.learningrate = learningRate
+        self.models = []
+
+    def fit(self, X, Y):
+        pred = np.zeros(len(Y))
+
+
+        for i in range(self.numberEstimators):
+            res = Y - pred
+
+            stump = DecisionStump
+            stump.fit(X,res)
