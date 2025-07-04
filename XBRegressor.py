@@ -52,5 +52,21 @@ class GBR:
         for i in range(self.numberEstimators):
             res = Y - pred
 
-            stump = DecisionStump
+            stump = DecisionStump()
             stump.fit(X,res)
+
+            update = stump.predict(X)
+
+            pred += self.learningrate * update
+
+            self.models.append(stump)
+
+    
+    def predict(self, X):
+        pred = np.zeros(X.shape[0])
+
+        for model in self.models:
+            pred += self.learningrate * model.predict(X)
+
+        return pred
+    
