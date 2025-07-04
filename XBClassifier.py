@@ -33,3 +33,36 @@ class DecisionStumpClassifier:
     def predict(self, X):
         return np.where(X[:, self.feature_index] <= self.threshold,
                         self.left_class, self.right_class)
+    
+class GBC:
+    def __init__(self, numberEstimators, learningRate):
+        self.numberEstimators = numberEstimators
+        self.learningrate = learningRate
+        self.models = []
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
+    def fit(self, X, Y):
+        pred = np.zeros(len(Y))  
+
+        for i in range(self.numberEstimators):
+            prob = self.sigmoid(pred)
+            gradient = Y - prob  
+
+            stump = DecisionStumpClassifier()
+            stump.fit(X, gradient)
+
+            update = stump.predict(X)
+            pred += self.learningrate * update
+
+            self.models.append(stump)
+
+    def predict_proba(self, X):
+        pred = np.zeros(X.shape[0])
+        for model in self.models:
+            pred += self.learningrate * model.predict(X)
+        return self.sigmoid(pred)
+
+    def predict(self, X):
+        return (self.predict_proba(X) >= 0.5).astype(int)
